@@ -16,15 +16,41 @@ LUALIB_API int luaU_error(lua_State* L, const char* fmt, ...) {
     return 0;
 }
 
-// stole from roblox source
-static int load_aux(lua_State* L, int status) {
-    if (status == 0)  /* OK? */
-        return 1;
-    else {
-        lua_pushnil(L);
-        lua_insert(L, -2);  /* put before error message */
-        return 2;  /* return nil plus error message */
+template<typename T>
+void PushArgument(lua_State* L, T arg) {
+    lua_pushnil(L);
+}
+
+template<>
+void PushArgument(lua_State* L, const char* arg) {
+    lua_pushstring(L, arg);
+}
+
+template<>
+void PushArgument(lua_State* L, int arg) {
+    lua_pushinteger(L, arg);
+}
+
+template<typename... Args>
+void CallGameCallHooks(lua_State* L, Args... args) {
+    lua_getglobal(L, "Game");
+    if (lua_isnil(L, -1)) {
+        lua_pop(L, 1); // Pop the nil value from the stack
+        return;
     }
+
+    lua_getfield(L, -1, "CallHooks");
+    if (!lua_isfunction(L, -1)) {
+        lua_pop(L, 2);
+        return;
+    }
+
+    int numArgs = sizeof...(Args);
+    (PushArgument(L, args), ...);
+
+    lua_call(L, numArgs, 0);
+
+    lua_pop(L, 1);
 }
 
 // doprint function exported directly from lua source
@@ -209,11 +235,7 @@ public:
         // get script context
         Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
-        Instances::TimeoutInstance* timeoutInst = new Instances::TimeoutInstance();
-        timeoutInst->end = LuauHelper::GetTime() + timeout;
-
-        // tell script context that this thread is yielding
-        context->yieldThreads.insert(std::pair<lua_State*, Instances::TimeoutInstance*>(L, timeoutInst));
+        context->YieldThread(L, timeout);
 
         // yield execution
 

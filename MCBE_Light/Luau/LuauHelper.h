@@ -9,6 +9,13 @@ namespace LuauHelper {
             COUNT_Identities      // count of identities
         };
     }
+
+    double GetTime() {
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        double seconds = std::chrono::duration<double>(currentTime.time_since_epoch()).count();
+
+        return seconds;
+    }
 }
 
 namespace Instances {
@@ -55,6 +62,23 @@ namespace Instances {
             return instance;
         }
 
+        void ResumeThread(lua_State* thread) {
+            ScriptContext* context = ScriptContext::Get();
+
+            context->yieldThreads.erase(thread);
+            lua_resume(thread, 0, 0);
+        }
+
+        void YieldThread(lua_State* thread, double timeout) {
+            Instances::ScriptContext* context = Instances::ScriptContext::Get();
+
+            Instances::TimeoutInstance* timeoutInst = new Instances::TimeoutInstance();
+            timeoutInst->end = LuauHelper::GetTime() + timeout;
+
+            // tell script context that this thread is yielding
+            context->yieldThreads.insert(std::pair<lua_State*, Instances::TimeoutInstance*>(thread, timeoutInst));
+		}
+
         void Set(lua_State* L, ExtraInstance* extra) {
 			luauThreads.insert(std::pair<lua_State*, ExtraInstance*>(L, extra));
 		}
@@ -84,13 +108,6 @@ namespace Instances {
 // these r main things
 namespace LuauHelper {
     std::queue<Instances::ScriptInstance> QueuedScripts{};
-
-    double GetTime() {
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        double seconds = std::chrono::duration<double>(currentTime.time_since_epoch()).count();
-
-        return seconds;
-    }
 }
 
 // funcs for global setup
@@ -209,7 +226,7 @@ namespace LuauHelper {
 
         */
 
-        LuauHelper::ExecuteLuau("Game.HooksList = {};\n\nlocal GameMetatable = { __index = Game }\n\nfunction Game:Connect(event, callback)\n	if type(callback) == 'function' then\n		if not Game.HooksList[event] then\n			Game.HooksList[event] = {}\n		end\n		table.insert(Game.HooksList[event], callback)\n	else \n		error('Invalid callback provided for event ' .. event)\n	end\nend\n\nfunction Game:CallHooks(event, ...)\n    if Game.HooksList[event] then\n        for _, hook in ipairs(Game.HooksList[event]) do\n            hook(...)\n        end\n    end\nend\n\nsetmetatable(Game, GameMetatable);",
+        LuauHelper::ExecuteLuau("Game.HooksList = {};\n\nlocal GameMetatable = { __index = Game }\n\nfunction Game:Connect(event, callback)\n	local str = event:match('^%s*(.-)%s*$')\n	\n	if type(callback) == 'function' then\n		if not Game.HooksList[str] then\n			Game.HooksList[str] = {}\n		end\n		table.insert(Game.HooksList[str], callback)\n	else \n		error('Invalid callback provided for event ' .. str)\n	end\nend\n\nfunction Game:CallHooks(event, ...)\n	local str = event:match('^%s*(.-)%s*$')\n	\n    if Game.HooksList[str] then\n        for _, hook in ipairs(Game.HooksList[str]) do\n            hook(...)\n        end\n    end\nend\n\nsetmetatable(Game, GameMetatable);",
             "InitScript", LuauHelper::Security::SystemScript);
     }
 }

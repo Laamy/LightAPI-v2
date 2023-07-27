@@ -188,6 +188,8 @@
     <ClInclude Include="SDK\Hook\FuncHook.h" />
     <ClInclude Include="SDK\Hook\Hooks\Keyboard\KeymapHook.h" />
     <ClInclude Include="SDK\Hook\Hooks\MinecraftRenderContext\SetupAndRender.h" />
+    <ClInclude Include="SDK\Job\JobBase.h" />
+    <ClInclude Include="SDK\Job\Jobs\ResumeJob.h" />
     <ClInclude Include="SDK\MemoryUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -13,6 +13,8 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 			UILayer::Toast_ToastScreen,
 			UILayer::Debug_DebugScreen,
 		})) {
+
+		// handle the waiting scripts
 		Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
 		for (auto timeout : context->yieldThreads) {
@@ -23,6 +25,16 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 				context->yieldThreads.erase(thread);
 				lua_resume(thread, 0, 0);
 			}
+		}
+
+		// handle queued scripts
+		if (!LuauHelper::QueuedScripts.empty()) {
+			// get the top script then pop it off the queue
+			Instances::ScriptInstance script = LuauHelper::QueuedScripts.front();
+			LuauHelper::QueuedScripts.pop();
+
+			// compile load then call the luau bytecode
+			LuauHelper::ExecuteLuau(script.source.c_str(), script.chunkname.c_str(), LuauHelper::Security::DefaultScript);
 		}
 	}
 }

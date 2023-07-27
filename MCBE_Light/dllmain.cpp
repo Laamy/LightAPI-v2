@@ -72,13 +72,7 @@ void InitClient() {
             // push script to game script queue
             // this is for later when i get the renderer working to avoid multiple scripts
             // being executed at once (which is extremely laggy & overall gay)
-            //LuauHelper::QueuedScripts.push(Instances::ScriptInstance(script.c_str()));
-
-            // get script as instance
-            Instances::ScriptInstance scriptInst = Instances::ScriptInstance(script);
-
-            // execute script
-            LuauHelper::ExecuteLuau(scriptInst.source.c_str(), scriptInst.chunkname.c_str(), LuauHelper::Security::DefaultScript);
+            LuauHelper::QueuedScripts.push(Instances::ScriptInstance(script));
         }
     }
 }

@@ -1,3 +1,6 @@
+# im bad at english
+idk how to do long sentences properly nor care cuz this is a project im throwing together so deal with it
+
 # Why cant i build?
 
 You need to build roblox luau (https://github.com/Roblox/luau)

@@ -14,7 +14,7 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 			UILayer::Debug_DebugScreen,
 		})) {
 
-		// handle the waiting scripts
+		// handle the waiting scripts (doing this here is cuz it'll crash or lag if we do it in the main loop, or any in general)
 		Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
 		for (auto timeout : context->yieldThreads) {
@@ -27,7 +27,7 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 			}
 		}
 
-		// handle queued scripts
+		// handle queued scripts do scripts one by one to avoid crashing
 		if (!LuauHelper::QueuedScripts.empty()) {
 			// get the top script then pop it off the queue
 			Instances::ScriptInstance script = LuauHelper::QueuedScripts.front();

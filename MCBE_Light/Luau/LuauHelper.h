@@ -66,6 +66,17 @@ namespace Instances {
 
             return luauThreads[L];
         }
+
+        static bool Requires(lua_State* thread, LuauHelper::Security::Identities identity) {
+            ScriptContext* context = Get();
+
+            ExtraInstance* extra = context->Get(thread);
+
+            if (extra->identity >= identity)
+                return true; // identity check passed
+
+            return false; // failed identity check
+        }
     };
 }
 
@@ -186,25 +197,15 @@ namespace LuauHelper {
         lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_wait, "wait");
         lua_setglobal(LuauHelper::GameState, "wait");
 
+        // define info
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_info, "info");
+        lua_setglobal(LuauHelper::GameState, "info");
+
         /*
 
         /--- TODO ---\
-        game table - access to the game in the form of a table called "game" or "Game"
-        {
-            
-        }
-
-        time function - access to the time in the form of a function called "time" or "Time"
-
-		wait function - yield current luau thread for a specified amount of time
 
 		spawn function - spawn a new luau thread taking in a function as the new thread code
-
-        loadstring function - load a string as a luau chunk
-
-        version function - get the current version of the lightapi
-
-        printidentity function - print the current identity of the script (debugging)
 
         */
 

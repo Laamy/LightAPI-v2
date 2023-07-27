@@ -84,6 +84,19 @@ public:
     }
 
     /// <summary>
+    /// stuff for system scripts
+    /// </summary>
+    static int env_info(lua_State* L)
+    {
+        if (Instances::ScriptContext::Requires(L, LuauHelper::Security::SystemScript))
+        {
+            return doPrint(L, MESSAGE_ERROR);
+        }
+
+        return luaU_error(L, "Identity of SystemScript required to run this function");
+    }
+
+    /// <summary>
     /// Create a new script instance then queue it for execution
     /// </summary>
     static int env_createscript(lua_State* L)

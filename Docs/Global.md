@@ -1,3 +1,55 @@
+# Lua fields
+
+```lua
+_G = {}
+```
+```lua
+_G.test = "hello world"
+
+-- print hello world
+createscript("print(_G.test)")
+```
+Allow defining variables cross scripts
+
+<br/>
+
+```lua
+shared = {}
+```
+```lua
+shared.test = "hello world"
+
+-- print hello world
+createscript("print(shared.test)")
+```
+Allow defining variables cross scripts
+Note that this is not the same as _G cuz i didnt set the metatables to be each other yet
+
+<br/>
+
+```lua
+Enum = {}
+```
+```lua
+-- print 1 cuz update is the enum number of 1
+print(Enum.GameEvent.Update)
+```
+stuff for me to use but I set them to global
+
+<br/>
+
+```lua
+Game = {}
+```
+```lua
+Game:Connect('keydown', function(key)
+  print(key)
+end)
+```
+the bridge from LUAU scripts to MINECRAFT
+
+<br/>
+
 # Lua functions
 
 ```lua

@@ -110,7 +110,7 @@ public:
     /// </summary>
     static int env_warn(lua_State* L)
     {
-        return doPrint(L, MESSAGE_OUTPUT);
+        return doPrint(L, MESSAGE_WARNING);
     }
 
     /// <summary>

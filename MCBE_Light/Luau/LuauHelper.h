@@ -235,11 +235,65 @@ namespace LuauHelper {
         lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_info, "info");
         lua_setglobal(LuauHelper::GameState, "info");
 
+        // define getidentity
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_getidentity, "getidentity");
+        lua_setglobal(LuauHelper::GameState, "getidentity");
+
         /*
 
         /--- TODO ---\
 
-        find more things to add idk i did my whole todo in 2 hours when it was meant to last 3 days bruh
+        setclipboard - set clipboard
+        setfps - set fps
+        getfps - get fps
+
+        readfile - read file contents
+        listfiles - get list of files in folder
+        writefile - clear then write text to file (or create if not exist)
+        makefolder - make a folder at the path in workspace
+        appendfile - append content to a file
+        isfile - checks if a workspace path is a file
+        isfolder - checks if a workspace path is a folder
+        delfile - delete file from workspace
+        delfolder - delete folder from workspace
+        dofile - execute file on new thread
+
+        isactive - check if window is currently active or not
+        mouse1click - fake mouse1btn keydown
+        mouse1press - fake mouse1btn keypress
+        mouse1release - fake mouse1btn keyup
+        mouse2click - fake mouse2btn keydown
+        mouse2press - fake mouse2btn keypress
+        mouse2release - fake mouse2btn keyup
+        mousemoveabs - move mouse to absolute position
+        mousemoverel - move mouse to relative position
+        mousescroll - scroll mouse wheel
+
+        Console {
+            clear - clear console
+            create - create new console
+            destroy - destroy console
+            input - get console input
+            print - print to console
+            title - get/set console title
+        }
+
+        Drawing {
+            new - create new drawing object
+            isrenderobj - check if an instance is a drawing instance
+            clearcache - clear all drawings from the screen (does not destroy them)
+        }
+
+        Http {
+			request - make a http request
+            WebSocket{
+			    connect - create new websocket
+				close - close websocket
+				send - send data to websocket
+                onmessage - hook websocket message event
+                onclose - hook websocket close event
+			}
+		}
 
         */
 

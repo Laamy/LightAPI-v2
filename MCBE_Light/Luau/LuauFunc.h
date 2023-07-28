@@ -324,4 +324,24 @@ public:
         // return the version string
         return 1;
     }
+
+    /// <summary>
+    /// Get the list of objects in the garbage collector
+    /// </summary>
+    static int env_getidentity(lua_State* L)
+    {
+        // get the current script context
+        Instances::ScriptContext* context = Instances::ScriptContext::Get();
+
+        // get the extra instance
+        Instances::ExtraInstance* extra = context->Get(L);
+
+        // get the identity
+        int identity = extra->identity;
+
+        lua_pushinteger(L, identity);
+
+        // return the version string
+        return 1;
+    }
 };

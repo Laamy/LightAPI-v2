@@ -1,6 +1,7 @@
 // quickly define these before everything else to avoid undefined errors
 // these r main things
 namespace LuauHelper {
+    // security stuff
     namespace Security {
         enum Identities {
             Anonymous = 0,        // default identity
@@ -10,6 +11,7 @@ namespace LuauHelper {
         };
     }
 
+    // get current time in seconds (lua util)
     double GetTime() {
         auto currentTime = std::chrono::high_resolution_clock::now();
         double seconds = std::chrono::duration<double>(currentTime.time_since_epoch()).count();
@@ -18,6 +20,7 @@ namespace LuauHelper {
     }
 }
 
+// game stuff
 namespace Instances {
     static std::string DefaultChunk = xorstr_("LightScript");
 
@@ -120,7 +123,11 @@ namespace LuauHelper {
 
     // this should be called by any scripts that want an identity, else it'll be treated as DefaultScript
     inline int ExecuteLuau(const char* _source, const char* chunkname, Security::Identities identity) {
-        lua_State* thread = lua_newthread(GameState);
+        lua_State* thread = GameState;
+
+        if (identity != Security::Identities::SystemScript) {
+            thread = lua_newthread(GameState); // create new thread if not a system script
+        }
 
         Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
@@ -131,7 +138,13 @@ namespace LuauHelper {
         // TODO: find way to do wait method without directly modifying the lua scripts executed
 
         std::stringstream scriptStream;
-        scriptStream << "coroutine.wrap(function() " << _source << " end)()";
+        if (identity != Security::Identities::SystemScript) {
+            // cant yield unless on a new thread
+            scriptStream << "coroutine.wrap(function() " << _source << " end)()";
+        }
+		else {
+			scriptStream << _source; // no new threads if system script (cant call wait methods & no security)
+		}
         const char* source = scriptStream.str().c_str();
 
         size_t bytecodeSize = 0;
@@ -167,6 +180,10 @@ namespace LuauHelper {
         // setup shared environment between scripts (& game stuff)
         lua_newtable(LuauHelper::GameState);
         lua_setglobal(LuauHelper::GameState, "Game");
+
+        // Enum
+        lua_newtable(LuauHelper::GameState);
+        lua_setglobal(LuauHelper::GameState, "Enum");
 
         // other
         lua_newtable(LuauHelper::GameState);
@@ -222,11 +239,11 @@ namespace LuauHelper {
 
         /--- TODO ---\
 
-		spawn function - spawn a new luau thread taking in a function as the new thread code
+        find more things to add idk i did my whole todo in 2 hours when it was meant to last 3 days bruh
 
         */
 
-        LuauHelper::ExecuteLuau("Game.HooksList = {};\n\nlocal GameMetatable = { __index = Game }\n\nfunction Game:Connect(event, callback)\n	local str = event:match('^%s*(.-)%s*$')\n	\n	if type(callback) == 'function' then\n		if not Game.HooksList[str] then\n			Game.HooksList[str] = {}\n		end\n		table.insert(Game.HooksList[str], callback)\n	else \n		error('Invalid callback provided for event ' .. str)\n	end\nend\n\nfunction Game:CallHooks(event, ...)\n	local str = event:match('^%s*(.-)%s*$')\n	\n    if Game.HooksList[str] then\n        for _, hook in ipairs(Game.HooksList[str]) do\n            hook(...)\n        end\n    end\nend\n\nsetmetatable(Game, GameMetatable);",
+        LuauHelper::ExecuteLuau("-- define hookslist\nGame.HooksList = {};\n\n-- define game metatable\nlocal GameMetatable = { __index = Game };\n\n-- define games connect function used to hook events\n-- usage: Game:Connect('render', function(screen, renderctx) end)\nfunction Game:Connect(event, callback)\n	if type(callback) == 'function' then\n		if not Game.HooksList[event] then\n			Game.HooksList[event] = {}\n		end\n		table.insert(Game.HooksList[event], callback)\n	else \n		error('Invalid callback provided for event ' .. event)\n	end\nend\n\n-- game events enum\nEnum.GameEvent = {\n	String = {\n		[1] = 'update',\n		[2] = 'keydown',\n		[3] = 'keyup',\n		[4] = 'keypress'\n	},\n	Update = 1,\n	KeyDown = 2,\n	KeyUp = 3,\n	KeyPress = 4\n};\n\n-- used to trigger a set of hooks (if they exist)\nfunction Game:CallHooks(event, ...)\n	if type(event) == 'number' then\n		event = Enum.GameEvent.String[event];\n	end\n	\n    if Game.HooksList[event] then\n        for _, hook in ipairs(Game.HooksList[event]) do\n            hook(...)\n        end\n    end\nend\n\n-- no clue how roblox exactly does theirs\n-- im just gonna do coroutine wrap until i figure that out\nfunction spawn(func)\n	coroutine.wrap(func)() -- call it in a new wrap/thread\nend\n\n-- set game metatable then quit\nsetmetatable(Game, GameMetatable);",
             "InitScript", LuauHelper::Security::SystemScript);
     }
 }

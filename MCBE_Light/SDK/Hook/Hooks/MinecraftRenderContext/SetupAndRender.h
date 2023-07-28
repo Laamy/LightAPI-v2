@@ -13,7 +13,7 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 			UILayer::Toast_ToastScreen,
 			UILayer::Debug_DebugScreen,
 		})) {
-		//CallGameCallHooks(LuauHelper::GameState, "render", screenview->tree->root->GetName().c_str());
+		CallGameCallHooks(LuauHelper::GameState, Game::GameEvent::Update, screenview->tree->root->GetName().c_str());
 
 		// handle the waiting scripts (doing this here is cuz it'll crash or lag if we do it in the main loop, or any in general)
 

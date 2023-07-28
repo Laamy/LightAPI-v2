@@ -16,6 +16,7 @@ LUALIB_API int luaU_error(lua_State* L, const char* fmt, ...) {
     return 0;
 }
 
+// helper functions for calling game hooks
 template<typename T>
 void PushArgument(lua_State* L, T arg) {
     lua_pushnil(L);
@@ -31,8 +32,9 @@ void PushArgument(lua_State* L, int arg) {
     lua_pushinteger(L, arg);
 }
 
+// function used in C++ to call the callhooks method so we can trigger game events
 template<typename... Args>
-void CallGameCallHooks(lua_State* L, Args... args) {
+void CallGameCallHooks(lua_State* L, Game::GameEvent event, Args... args) {
     lua_getglobal(L, "Game");
     if (lua_isnil(L, -1)) {
         lua_pop(L, 1); // Pop the nil value from the stack
@@ -45,10 +47,12 @@ void CallGameCallHooks(lua_State* L, Args... args) {
         return;
     }
 
+    lua_pushinteger(L, (int)event);
+
     int numArgs = sizeof...(Args);
     (PushArgument(L, args), ...);
 
-    lua_call(L, numArgs, 0);
+    lua_call(L, numArgs + 1, 0);
 
     lua_pop(L, 1);
 }
@@ -127,21 +131,26 @@ public:
     /// </summary>
     static int env_createscript(lua_State* L)
     {
+        // get arguments count
         int nargs = lua_gettop(L);
 
+        //if less then 1 argument error
         if (nargs < 1)
         {
             return luaU_error(L, "atleast 1 argument required");
         }
 
+        // if the first argument is not a string error
         if (!lua_isstring(L, 1))
         {
             return luaU_error(L, "arguments must be strings");
         }
 
+        // get script and default chunkname
         const char* script = lua_tostring(L, 1);
         const char* chunkname = Instances::DefaultChunk.c_str();
 
+        // if argumets more then 1 then use the chunkname provided
         if (nargs > 1)
         {
             if (!lua_isstring(L, 2))
@@ -152,6 +161,7 @@ public:
             chunkname = lua_tostring(L, 2);
         }
 
+        // queue script for execution
         LuauHelper::QueuedScripts.push(Instances::ScriptInstance(script, chunkname));
 
         return 0;
@@ -162,20 +172,25 @@ public:
     /// </summary>
     static int env_error(lua_State* L)
     {
+        // get arguments count
         int nargs = lua_gettop(L);
 
+        // if less then 1 argument error
         if (nargs < 1)
         {
             return luaU_error(L, "luau error thrown");
         }
 
+        // if the first argument is not a string error
         if (!lua_isstring(L, 1))
         {
             return luaU_error(L, "luau error thrown");
         }
 
+        // get error
         const char* error = lua_tostring(L, 1);
 
+        // throw error
         return luaU_error(L, error);
     }
 
@@ -185,6 +200,7 @@ public:
     /// </summary>
     static int env_identifyname(lua_State* L)
     {
+        // return the name of the api
         lua_pushstring(L, "LightAPI");
 
         return 1;
@@ -195,20 +211,28 @@ public:
     /// </summary>
     static int env_printidentity(lua_State* L)
     {
+        // get the current script context
         Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
+        // get the extra instance
         Instances::ExtraInstance* extra = context->Get(L);
 
+        // get the identity
         int identity = extra->identity;
 
+        // if there is an argument then print the argument instead
         if (lua_gettop(L) > 0) {
+
+            // if the first argument is not a string error
             if (!lua_isstring(L, 1)) {
 				return luaU_error(L, "arguments must be strings");
 			}
 
+            // print the argument
             LogMessage(MESSAGE_OUTPUT, "%s %d", lua_tostring(L, 1), identity);
         }
         else {
+            // print the identity normally
             LogMessage(MESSAGE_OUTPUT, "Current identity is %d", identity);
         }
 
@@ -228,13 +252,15 @@ public:
             timeout = 0; // 0 isn't true 0 its just next frame when it gets around to resuming threads
         }
 
-        if (timeout > 0xFFFF){ // if its over 65535 seconds just set it to 0
+        // if its over 65535 seconds just set it to 0
+        if (timeout > 0xFFFF){
             timeout = 0;
 		}
 
         // get script context
         Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
+        // yield thread via script context
         context->YieldThread(L, timeout);
 
         // yield execution
@@ -247,6 +273,7 @@ public:
     /// </summary>
     static int env_time(lua_State* L)
     {
+        // push the current time in seconds (as we want lua to use seconds not ms)
         lua_pushnumber(L, LuauHelper::GetTime());
 
         return 1;
@@ -257,23 +284,29 @@ public:
     /// </summary>
     static int env_loadstring(lua_State* L) 
     {
+        // get script & chunkname as chunks
         size_t size;
         const char* script = luaL_checklstring(L, 1, &size);
         const char* chunkname = luaL_optstring(L, 2, script);
 
+        // compile string to luau bytecode
         size_t bytecodeSize;
         char* bytecode = luau_compile(script, strlen(script), NULL, &bytecodeSize);
 
+        // load bytecode then check status
         int status = luau_load(L, chunkname, bytecode, bytecodeSize, 0);
 
         if (status != 0) {
             const char* error = lua_tostring(L, -1);
 
+            // if failed & error exists cast new luau error so parent thread can catch it
             if (error) {
                 luaU_error(L, error);
             }
         }
 
+        // we would call it but might aswell give the bytecode as the result (luau function)
+        // so that they can call it when they want 2
         //lua_call(L, 0, 0);
 
         // return loaded bytecode
@@ -285,8 +318,10 @@ public:
     /// </summary>
     static int env_version(lua_State* L)
     {
+        // return the version of the api
         lua_pushstring(L, "v0.1.1");
 
+        // return the version string
         return 1;
     }
 };

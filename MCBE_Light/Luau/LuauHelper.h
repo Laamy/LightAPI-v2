@@ -246,6 +246,7 @@ namespace LuauHelper {
         setclipboard - set clipboard
         setfps - set fps
         getfps - get fps
+        isactive - check if window is currently active or not
 
         readfile - read file contents
         listfiles - get list of files in folder
@@ -258,7 +259,6 @@ namespace LuauHelper {
         delfolder - delete folder from workspace
         dofile - execute file on new thread
 
-        isactive - check if window is currently active or not
         mouse1click - fake mouse1btn keydown
         mouse1press - fake mouse1btn keypress
         mouse1release - fake mouse1btn keyup

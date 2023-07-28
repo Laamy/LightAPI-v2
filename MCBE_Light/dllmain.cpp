@@ -1,4 +1,4 @@
-#pragma region Includes
+#pragma region C/C++ Includes
 
 #include <windows.h>
 #include <vector>
@@ -13,6 +13,10 @@
 #include <lua.h>
 #include <lualib.h>
 #include <luacode.h>
+
+#pragma endregion
+
+#pragma region Main Includes
 
 #include "Libs/xorstr.h"
 #include "Libs/minhook/minhook.h"
@@ -49,7 +53,7 @@ void InitClient() {
     if (FileIO::setupClientPath()) {
         FileIO::createPath(xorstr_("autoexecute"));
         FileIO::createPath(xorstr_("workspace"));
-        FileIO::writeFile(xorstr_("script.tmp"), "print\"Setup script pipe\"");
+        FileIO::writeFile(xorstr_("script.tmp"), "print\"Script pipe setup\"");
     }
 
     // setup game hooks
@@ -73,8 +77,6 @@ void InitClient() {
             FileIO::writeFile(xorstr_("script.tmp"), "");
 
             // push script to game script queue
-            // this is for later when i get the renderer working to avoid multiple scripts
-            // being executed at once (which is extremely laggy & overall gay)
             LuauHelper::QueuedScripts.push(Instances::ScriptInstance(script));
         }
     }

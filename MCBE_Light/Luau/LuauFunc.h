@@ -254,7 +254,7 @@ public:
 
         // if its over 65535 seconds just set it to 0
         if (timeout > 0xFFFF){
-            timeout = 0;
+            return luaU_error(L, "max wait is 65535");
 		}
 
         // get script context

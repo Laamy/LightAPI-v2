@@ -47,7 +47,8 @@ void InitClient() {
 
     // client path setup
     if (FileIO::setupClientPath()) {
-        FileIO::createPath(xorstr_("AutoExecute"));
+        FileIO::createPath(xorstr_("autoexecute"));
+        FileIO::createPath(xorstr_("workspace"));
         FileIO::writeFile(xorstr_("script.tmp"), "print\"Setup script pipe\"");
     }
 

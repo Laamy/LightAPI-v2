@@ -139,7 +139,7 @@ Stops executing of lua state and queues it in script context with a new TimeoutI
 <br/>
 
 ```lua
-wait(double seconds = 0.01667) -> returns 0
+spawn(LuaFunc func) -> returns 0
 ```
 ```lua
 -- print test

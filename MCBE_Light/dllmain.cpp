@@ -18,6 +18,9 @@
 
 #pragma endregion
 
+// used for console
+FILE* __f;
+
 #pragma region Main Includes
 
 #include "Libs/xorstr.h"
@@ -36,8 +39,6 @@
 #include "SDK/Hook/FuncHook.h"
 
 #pragma endregion
-
-FILE* __f;
 
 void InitClient() {
     // setup debug console/output

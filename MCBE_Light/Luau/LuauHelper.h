@@ -6,7 +6,7 @@ namespace LuauHelper {
         enum Identities {
             Anonymous = 0,        // default identity
             DefaultScript,        // default lightapi script identity
-            SystemScript,           // init script identity
+            SystemScript,         // init script identity
             COUNT_Identities      // count of identities
         };
     }
@@ -221,6 +221,7 @@ namespace LuauHelper {
         return 0;
     }
 
+    // lua function structure for quick assignment
     struct LuaFunction {
         const char* name;
         lua_CFunction func;
@@ -257,6 +258,14 @@ namespace LuauHelper {
         { "delfile", ScriptEnvrioment::env_delfile },
         { "delfolder", ScriptEnvrioment::env_delfile },
         { "dofile", ScriptEnvrioment::env_dofile },
+
+        // console api
+        { "rconsoleclear", ScriptEnvrioment::env_rconsoleclear },
+        { "rconsolecreate", ScriptEnvrioment::env_rconsolecreate },
+        { "rconsoledestroy", ScriptEnvrioment::env_rconsoledestroy },
+        { "rconsoleprint", ScriptEnvrioment::env_rconsoleprint },
+        { "rconsoleinput", ScriptEnvrioment::env_rconsoleinput },
+        { "rconsoletitle", ScriptEnvrioment::env_rconsoletitle },
 
         // misc
         { "time", ScriptEnvrioment::env_time },
@@ -299,11 +308,6 @@ namespace LuauHelper {
 
         /--- TODO ---\
 
-        rconsoleclear - clear console
-        rconsolecreate - create new console
-        rconsoledestroy - destroy console
-        rconsoleinput - get console input
-        rconsoleprint - print to console
         rconsoletitle - get/set console title
 
         setfps - set fps

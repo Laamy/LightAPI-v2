@@ -651,4 +651,104 @@ public:
 
         return 0;
     }
+
+    /// <summary>
+    /// clear console
+    /// </summary>
+    static int env_rconsoleclear(lua_State* L)
+    {
+        // lol im lazy
+        // calls system batch command "cls" (NOT SAFE)
+        system("cls");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// create console
+    /// </summary>
+    static int env_rconsolecreate(lua_State* L)
+    {
+        if (!GetConsoleWindow())
+        {
+            AllocConsole();
+
+            freopen_s(&__f, "CONOUT$", "w", stdout);
+            freopen_s(&__f, "CONIN$", "r", stdin);
+            SetConsoleTitleA("Light");
+        }
+        else {
+            ShowWindow(GetConsoleWindow(), SW_SHOW);
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// destroy console
+    /// </summary>
+    static int env_rconsoledestroy(lua_State* L)
+    {
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
+        system("cls");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// get input from console
+    /// </summary>
+    static int env_rconsoleinput(lua_State* L)
+    {
+        std::string input;
+        std::cin >> input;
+
+        lua_pushstring(L, input.c_str());
+
+        return 1;
+    }
+
+    /// <summary>
+    /// print raw text to console
+    /// </summary>
+    static int env_rconsoleprint(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "atleast 1 argument expected");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "string arguments expected");
+        }
+
+        const char* text = lua_tostring(L, 1);
+
+        std::cout << text;
+
+        return 0;
+    }
+
+    /// <summary>
+    /// print raw text to console
+    /// </summary>
+    static int env_rconsoletitle(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "atleast 1 argument expected");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "string arguments expected");
+        }
+
+        const char* text = lua_tostring(L, 1);
+
+        SetConsoleTitleA(text);
+
+        return 0;
+    }
 };

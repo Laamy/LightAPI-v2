@@ -33,7 +33,6 @@
 #include "Luau/LuauHelper.h"
 
 #include "SDK/Job/JobBase.h"
-
 #include "SDK/Hook/FuncHook.h"
 
 #pragma endregion

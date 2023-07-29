@@ -40,6 +40,7 @@ namespace Instances {
         }
     };
 
+    // used to store extra information about a lua state/thread
     class ExtraInstance {
     public:
         LuauHelper::Security::Identities identity;
@@ -50,55 +51,81 @@ namespace Instances {
 		}
     };
 
+    // timeout instance used for resumejob
     class TimeoutInstance {
     public:
         double end;
     };
 
+    // context for scripts (lua states/threads)
     class ScriptContext {
     public:
+        // lua states/threads with an identity
         std::map<lua_State*, ExtraInstance*> luauThreads;
+
+        // lua states/threads that are yielding (resumed by resumejob)
         std::map<lua_State*, TimeoutInstance*> yieldThreads;
 
+        // singleton function
         static ScriptContext* Get() {
             static ScriptContext* instance = new ScriptContext();
             return instance;
         }
 
+        // resume thread
         void ResumeThread(lua_State* thread) {
+            // get script context
             ScriptContext* context = ScriptContext::Get();
 
+            // erase from yield threads map
             context->yieldThreads.erase(thread);
+
+            // resume thread execution
             lua_resume(thread, 0, 0);
         }
 
+        // yield thread execution
         void YieldThread(lua_State* thread, double timeout) {
+            // get script context
             Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
+            // make timeout instance
             Instances::TimeoutInstance* timeoutInst = new Instances::TimeoutInstance();
+
+            // set timeout to current time plus timeout
             timeoutInst->end = LuauHelper::GetTime() + timeout;
 
-            // tell script context that this thread is yielding
+            // tell script context that this thread is yielding by inserting into yield threads map
             context->yieldThreads.insert(std::pair<lua_State*, Instances::TimeoutInstance*>(thread, timeoutInst));
 		}
 
+        // assign extrainstance to luau state/thread
         void Set(lua_State* L, ExtraInstance* extra) {
+            // insert extra instance pointer into luau threads map
 			luauThreads.insert(std::pair<lua_State*, ExtraInstance*>(L, extra));
 		}
 
+        // get extrainstance from luau state/thread
         ExtraInstance* Get(lua_State* L) {
+            // check if extra instance exists
             if (luauThreads[L] == nullptr) {
+                // if not, create a new one with default identity
 				luauThreads[L] = new ExtraInstance(LuauHelper::Security::DefaultScript);
 			}
 
+            // return extra instance pointer
             return luauThreads[L];
         }
 
+        // used to check if a luau state/thread has permissions to do something
         static bool Requires(lua_State* thread, LuauHelper::Security::Identities identity) {
+            // get script context
             ScriptContext* context = Get();
 
+            // get extra instance from state/thread map
             ExtraInstance* extra = context->Get(thread);
 
+            // check if identity is greater than or equal to required identity
             if (extra->identity >= identity)
                 return true; // identity check passed
 
@@ -110,6 +137,7 @@ namespace Instances {
 // quickly define these before everything else to avoid undefined errors
 // these r main things
 namespace LuauHelper {
+    // queued scripts queue
     std::queue<Instances::ScriptInstance> QueuedScripts{};
 }
 
@@ -118,17 +146,20 @@ namespace LuauHelper {
 #include <functional>
 
 namespace LuauHelper {
+    // global lua state all scripts inherit from
     lua_State* GameState = luaL_newstate();
-    lua_State* SharedState = luaL_newstate();
 
     // this should be called by any scripts that want an identity, else it'll be treated as DefaultScript
     inline int ExecuteLuau(const char* _source, const char* chunkname, Security::Identities identity) {
+        // get lua state/thread
         lua_State* thread = GameState;
 
+        // create new thread if not a system script
         if (identity != Security::Identities::SystemScript) {
-            thread = lua_newthread(GameState); // create new thread if not a system script
+            thread = lua_newthread(GameState);
         }
 
+        // get script context
         Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
         // assign identity extra to the thread
@@ -137,7 +168,10 @@ namespace LuauHelper {
         // it should already be in a thread but it still errors when yielding so i'll do this hacky thing
         // TODO: find way to do wait method without directly modifying the lua scripts executed
 
+        // create script stream
         std::stringstream scriptStream;
+
+        // wrap script in coroutine if not system script
         if (identity != Security::Identities::SystemScript) {
             // cant yield unless on a new thread
             scriptStream << "coroutine.wrap(function() " << _source << " end)()";
@@ -145,27 +179,40 @@ namespace LuauHelper {
 		else {
 			scriptStream << _source; // no new threads if system script (cant call wait methods & no security)
 		}
+
+        // get stream result
         const char* source = scriptStream.str().c_str();
 
+        // compile script to luau bytecode
         size_t bytecodeSize = 0;
         char* bytecode = luau_compile(source, strlen(source), NULL, &bytecodeSize);
 
+        // load luau bytecode into the VM
         int result = luau_load(thread, chunkname, bytecode, bytecodeSize, 0);
 
+        // free the bytecode
         free(bytecode);
 
+        // check if there was an error
         if (result != 0) {
+            // get error message
             const char* errorMsg = lua_tostring(thread, -1);
+
+            // log error message
             LogMessage(MESSAGE_ERROR, errorMsg);
 
+            // pop error message from stack
             lua_pop(thread, 1);
             return 1;
         }
         else {
+            // try catch cuz i cause std::exceptions in my script functions (cuz luau does that too for some reason)
             try {
+                // call the luau thread from loaded bytecode
                 lua_call(thread, 0, 0);
             }
             catch (const std::exception& e) {
+                // log error message
                 LogMessage(MESSAGE_ERROR, e.what());
                 return 1;
             }
@@ -174,8 +221,52 @@ namespace LuauHelper {
         return 0;
     }
 
+    struct LuaFunction {
+        const char* name;
+        lua_CFunction func;
+    };
+
+    LuaFunction functions[] = {
+        // default console stuff
+        { "print", ScriptEnvrioment::env_print },
+        { "warn", ScriptEnvrioment::env_warn },
+        { "error", ScriptEnvrioment::env_error },
+        { "info", ScriptEnvrioment::env_info }, // this is for systemscripts not for default scripts
+
+        // identification
+        { "identify", ScriptEnvrioment::env_identifyname },
+        { "printidentity", ScriptEnvrioment::env_printidentity },
+        { "version", ScriptEnvrioment::env_version },
+        { "getidentity", ScriptEnvrioment::env_getidentity },
+
+        // luau bytecode stuff
+        { "createscript", ScriptEnvrioment::env_createscript },
+        { "loadstring", ScriptEnvrioment::env_loadstring },
+
+        // roblox mains
+        { "wait", ScriptEnvrioment::env_wait },
+
+        // filesystem
+        { "readfile", ScriptEnvrioment::env_readfile },
+        { "listfiles", ScriptEnvrioment::env_listfiles },
+        { "writefile", ScriptEnvrioment::env_writefile },
+        { "makefolder", ScriptEnvrioment::env_makefolder },
+        { "appendfile", ScriptEnvrioment::env_appendfile },
+        { "isfile", ScriptEnvrioment::env_isfile },
+        { "isfolder", ScriptEnvrioment::env_isfolder },
+        { "delfile", ScriptEnvrioment::env_delfile },
+        { "delfolder", ScriptEnvrioment::env_delfile },
+        { "dofile", ScriptEnvrioment::env_dofile },
+
+        // misc
+        { "time", ScriptEnvrioment::env_time },
+        { "setclipboard", ScriptEnvrioment::env_setclipboard },
+    };
+
     inline void SetupEnvrionment() {
         luaL_openlibs(LuauHelper::GameState);
+
+#pragma region Global Fields
 
         // setup shared environment between scripts (& game stuff)
         lua_newtable(LuauHelper::GameState);
@@ -188,106 +279,33 @@ namespace LuauHelper {
         // other
         lua_newtable(LuauHelper::GameState);
         lua_setglobal(LuauHelper::GameState, "_G");
-        lua_newtable(LuauHelper::GameState);
-        lua_setglobal(LuauHelper::GameState, "shared");
 
-        // define print
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_print, "print");
-        lua_setglobal(LuauHelper::GameState, "print");
+#pragma endregion
 
-        // define warn
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_warn, "warn");
-        lua_setglobal(LuauHelper::GameState, "warn");
+        // get function count
+        int numFunctions = sizeof(functions) / sizeof(functions[0]);
 
-        // define error
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_error, "error");
-        lua_setglobal(LuauHelper::GameState, "error");
+        // loop over functions then register them
+        for (int i = 0; i < numFunctions; i++) {
+            // get luafunction
+            LuaFunction function = functions[i];
 
-        // define identity
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_identifyname, "identify");
-        lua_setglobal(LuauHelper::GameState, "identify");
-
-        // define queuescript
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_createscript, "createscript");
-        lua_setglobal(LuauHelper::GameState, "createscript");
-
-        // define time
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_time, "time");
-        lua_setglobal(LuauHelper::GameState, "time");
-
-        // define printidentity
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_printidentity, "printidentity");
-        lua_setglobal(LuauHelper::GameState, "printidentity");
-
-        // define loadstring
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_loadstring, "loadstring");
-        lua_setglobal(LuauHelper::GameState, "loadstring");
-
-        // define version
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_version, "version");
-        lua_setglobal(LuauHelper::GameState, "version");
-
-        // define wait
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_wait, "wait");
-        lua_setglobal(LuauHelper::GameState, "wait");
-
-        // define info
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_info, "info");
-        lua_setglobal(LuauHelper::GameState, "info");
-
-        // define getidentity
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_getidentity, "getidentity");
-        lua_setglobal(LuauHelper::GameState, "getidentity");
-
-        // define readfile
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_readfile, "readfile");
-        lua_setglobal(LuauHelper::GameState, "readfile");
-
-        // define listfiles
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_listfiles, "listfiles");
-        lua_setglobal(LuauHelper::GameState, "listfiles");
-
-        // define writefile
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_writefile, "writefile");
-        lua_setglobal(LuauHelper::GameState, "writefile");
-
-        // define makefolder
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_makefolder, "makefolder");
-        lua_setglobal(LuauHelper::GameState, "makefolder");
-
-        // define appendfile
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_appendfile, "appendfile");
-        lua_setglobal(LuauHelper::GameState, "appendfile");
-
-        // define isfile
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_isfile, "isfile");
-        lua_setglobal(LuauHelper::GameState, "isfile");
-
-        // define isfolder
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_isfolder, "isfolder");
-        lua_setglobal(LuauHelper::GameState, "isfolder");
-
-        // define delfile
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_delfile, "delfile");
-        lua_setglobal(LuauHelper::GameState, "delfile");
-
-        // define delfolder
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_delfile, "delfolder");
-        lua_setglobal(LuauHelper::GameState, "delfolder");
-
-        // define dofile
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_dofile, "dofile");
-        lua_setglobal(LuauHelper::GameState, "dofile");
-
-        // define setclipboard
-        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_setclipboard, "setclipboard");
-        lua_setglobal(LuauHelper::GameState, "setclipboard");
+            // push then setglobal
+            lua_pushcfunction(LuauHelper::GameState, function.func, function.name);
+            lua_setglobal(LuauHelper::GameState, function.name);
+        }
 
         /*
 
         /--- TODO ---\
 
-        setclipboard - set clipboard
+        rconsoleclear - clear console
+        rconsolecreate - create new console
+        rconsoledestroy - destroy console
+        rconsoleinput - get console input
+        rconsoleprint - print to console
+        rconsoletitle - get/set console title
+
         setfps - set fps
         getfps - get fps
         isactive - check if window is currently active or not
@@ -301,13 +319,6 @@ namespace LuauHelper {
         mousemoveabs - move mouse to absolute position
         mousemoverel - move mouse to relative position
         mousescroll - scroll mouse wheel
-
-        rconsoleclear - clear console
-        rconsolecreate - create new console
-        rconsoledestroy - destroy console
-        rconsoleinput - get console input
-        rconsoleprint - print to console
-        rconsoletitle - get/set console title
 
         Drawing {
             new - create new drawing object

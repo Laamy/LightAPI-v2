@@ -13,12 +13,16 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 			UILayer::Toast_ToastScreen,
 			UILayer::Debug_DebugScreen,
 		})) {
+
+		// call the render frame event in luau
 		CallGameCallHooks(LuauHelper::GameState, Game::GameEvent::Update, screenview->tree->root->GetName().c_str());
 
 		// handle the waiting scripts (doing this here is cuz it'll crash or lag if we do it in the main loop, or any in general)
 
+		// get script context
 		Instances::ScriptContext* context = Instances::ScriptContext::Get();
 		
+		// execute resume job so scripts that called "wait" can be resumed once timeout is finished
 		ResumeJob::Get()->ExecuteTask(context);
 
 		// handle queued scripts do scripts one by one to avoid crashing

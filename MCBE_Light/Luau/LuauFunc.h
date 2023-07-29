@@ -155,6 +155,7 @@ public:
     /// </summary>
     static int env_info(lua_State* L)
     {
+        // requires to be a systemscript to execute this method
         if (Instances::ScriptContext::Requires(L, LuauHelper::Security::SystemScript))
         {
             return doPrint(L, MESSAGE_ERROR);

@@ -57,6 +57,15 @@ void CallGameCallHooks(lua_State* L, Game::GameEvent event, Args... args) {
     lua_pop(L, 1);
 }
 
+// push a table of strings to the stack
+static void pushStringVector(lua_State* L, const std::vector<std::string>& vec) {
+    lua_newtable(L);
+    for (size_t i = 0; i < vec.size(); ++i) {
+        lua_pushstring(L, vec[i].c_str());
+        lua_rawseti(L, -2, static_cast<int>(i + 1));
+    }
+}
+
 // doprint function exported directly from lua source
 int doPrint(lua_State* L, MessageType type)
 {
@@ -326,7 +335,7 @@ public:
     }
 
     /// <summary>
-    /// Get the list of objects in the garbage collector
+    /// return the current identity of the lua thread
     /// </summary>
     static int env_getidentity(lua_State* L)
     {
@@ -342,6 +351,71 @@ public:
         lua_pushinteger(L, identity);
 
         // return the version string
+        return 1;
+    }
+
+    /// <summary>
+    /// Get the list of objects in the garbage collector
+    /// </summary>
+    static int env_readfile(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << "workspace\\" << lua_tostring(L, 1);
+
+        std::string content = FileIO::readFile(ss.str());
+
+        lua_pushstring(L, content.c_str());
+
+        return 1;
+    }
+
+    /// <summary>
+    /// Get a list of files in a folder
+    /// </summary>
+    static int env_listfiles(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        std::string folder;
+        std::string client = FileIO::getClientPath();
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << client << "workspace\\" << std::string(lua_tostring(L, 1));
+
+        folder = ss.str();
+
+        if (!std::filesystem::is_directory(folder.c_str())) {
+            return luaU_error(L, "directory not found '%s'", folder.c_str());
+        }
+
+        std::vector<std::string> file_list;
+
+        for (const auto& entry : std::filesystem::directory_iterator(folder.c_str())) {
+            if (entry.is_regular_file()) {
+                file_list.push_back(entry.path().filename().string());
+            }
+        }
+
+        pushStringVector(L, file_list);
+
         return 1;
     }
 };

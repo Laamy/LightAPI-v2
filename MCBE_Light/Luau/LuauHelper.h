@@ -239,6 +239,14 @@ namespace LuauHelper {
         lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_getidentity, "getidentity");
         lua_setglobal(LuauHelper::GameState, "getidentity");
 
+        // define readfile
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_readfile, "readfile");
+        lua_setglobal(LuauHelper::GameState, "readfile");
+
+        // define listfiles
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_listfiles, "listfiles");
+        lua_setglobal(LuauHelper::GameState, "listfiles");
+
         /*
 
         /--- TODO ---\
@@ -248,7 +256,6 @@ namespace LuauHelper {
         getfps - get fps
         isactive - check if window is currently active or not
 
-        readfile - read file contents
         listfiles - get list of files in folder
         writefile - clear then write text to file (or create if not exist)
         makefolder - make a folder at the path in workspace

@@ -8,6 +8,11 @@ then put the built .libs in C:\Luau\x64\libs
 you then put the remaining linker headers in C:\Luau\x64\includes
 if you dont know how to do this then dont bother me
 
+heres some extra information on this
+the project assumes you have a folder in your C: drive called "Luau"
+make a folder in C: called Luau "C:\Luau"
+extract the file x64.rar that i put in the solution source into there and magic u can build !!!!!
+
 # How does this work?
 
 What lua

@@ -255,6 +255,10 @@ namespace LuauHelper {
         lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_makefolder, "makefolder");
         lua_setglobal(LuauHelper::GameState, "makefolder");
 
+        // define appendfile
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_appendfile, "appendfile");
+        lua_setglobal(LuauHelper::GameState, "appendfile");
+
         /*
 
         /--- TODO ---\
@@ -264,7 +268,6 @@ namespace LuauHelper {
         getfps - get fps
         isactive - check if window is currently active or not
 
-        makefolder - make a folder at the path in workspace
         appendfile - append content to a file
         isfile - checks if a workspace path is a file
         isfolder - checks if a workspace path is a folder

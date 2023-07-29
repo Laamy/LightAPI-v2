@@ -52,7 +52,7 @@ public:
         }
     }
 
-    static std::string readFile(const std::string& filePath)
+    static std::string readFile(const std::string& filePath, bool noError = false)
     {
         std::ifstream file(getClientPath() + filePath);
         std::string content;
@@ -68,6 +68,10 @@ public:
             file.close();
         }
         else {
+            if (noError) {
+				return content;
+			}
+
             LogMessage(MESSAGE_ERROR, "[fileio.h]: 67, Unable to open the file for reading");
         }
         return content;

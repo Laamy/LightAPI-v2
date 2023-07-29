@@ -464,4 +464,28 @@ public:
 
         return 0;
     }
+
+    /// <summary>
+    /// append content to a file (and create it if it doesnt exist)
+    /// </summary>
+    static int env_appendfile(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 2) {
+            return luaU_error(L, "expected atleast 2 argument");
+        }
+
+        if (!lua_isstring(L, 1) || !lua_isstring(L, 2)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << "workspace\\" << lua_tostring(L, 1);
+
+        std::string content = FileIO::readFile(ss.str(), true);
+        FileIO::writeFile(ss.str(), content + lua_tostring(L, 2));
+
+        return 0;
+    }
 };

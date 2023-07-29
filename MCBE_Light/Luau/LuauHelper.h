@@ -308,8 +308,6 @@ namespace LuauHelper {
 
         /--- TODO ---\
 
-        rconsoletitle - get/set console title
-
         setfps - set fps
         getfps - get fps
         isactive - check if window is currently active or not

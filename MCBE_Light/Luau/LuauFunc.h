@@ -16,6 +16,23 @@ LUALIB_API int luaU_error(lua_State* L, const char* fmt, ...) {
     return 0;
 }
 
+// stolen code
+void ClearConsoleScreen() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD count;
+    COORD homeCoords = { 0, 0 };
+
+    if (hConsole == INVALID_HANDLE_VALUE || !GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+        return;
+    }
+
+    int cells = csbi.dwSize.X * csbi.dwSize.Y;
+
+    FillConsoleOutputCharacter(hConsole, ' ', cells, homeCoords, &count);
+    SetConsoleCursorPosition(hConsole, homeCoords);
+}
+
 // clkipboard stuff from stackoverflow
 bool setClipboardText(const std::string& text) {
     if (!OpenClipboard(nullptr))
@@ -659,7 +676,7 @@ public:
     {
         // lol im lazy
         // calls system batch command "cls" (NOT SAFE)
-        system("cls");
+        ClearConsoleScreen();
 
         return 0;
     }
@@ -690,7 +707,7 @@ public:
     static int env_rconsoledestroy(lua_State* L)
     {
         ShowWindow(GetConsoleWindow(), SW_HIDE);
-        system("cls");
+        ClearConsoleScreen();
 
         return 0;
     }

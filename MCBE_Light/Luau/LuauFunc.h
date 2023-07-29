@@ -420,7 +420,7 @@ public:
     }
 
     /// <summary>
-    /// Get the list of objects in the garbage collector
+    /// write to a file (and create it if it doesnt exist)
     /// </summary>
     static int env_writefile(lua_State* L)
     {
@@ -438,6 +438,29 @@ public:
         ss << "workspace\\" << lua_tostring(L, 1);
 
         FileIO::writeFile(ss.str(), lua_tostring(L, 2));
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Create a folder
+    /// </summary>
+    static int env_makefolder(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << "workspace\\" << lua_tostring(L, 1);
+
+        FileIO::createPath(ss.str());
 
         return 0;
     }

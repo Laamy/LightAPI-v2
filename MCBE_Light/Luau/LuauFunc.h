@@ -488,4 +488,118 @@ public:
 
         return 0;
     }
+
+    /// <summary>
+    /// returns if path is a file or not
+    /// </summary>
+    static int env_isfile(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        std::string folder;
+        std::string client = FileIO::getClientPath();
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << client << "workspace\\" << std::string(lua_tostring(L, 1));
+
+        folder = ss.str();
+
+        lua_pushboolean(L,
+            std::filesystem::is_regular_file(folder.c_str()) ||
+            std::filesystem::is_block_file(folder.c_str()) ||
+            std::filesystem::is_character_file(folder.c_str()));
+
+        return 1;
+    }
+
+    /// <summary>
+    /// returns if path is a folder or not
+    /// </summary>
+    static int env_isfolder(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        std::string folder;
+        std::string client = FileIO::getClientPath();
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << client << "workspace\\" << std::string(lua_tostring(L, 1));
+
+        folder = ss.str();
+
+        lua_pushboolean(L, std::filesystem::is_directory(folder.c_str()));
+
+        return 1;
+    }
+
+    /// <summary>
+    /// returns if path is a folder or not
+    /// </summary>
+    static int env_delfile(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        std::string folder;
+        std::string client = FileIO::getClientPath();
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << client << "workspace\\" << std::string(lua_tostring(L, 1));
+
+        folder = ss.str();
+
+        std::filesystem::remove(folder.c_str());
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Creates a new script instance and assigns the content and name to script content & chunkname
+    /// </summary>
+    static int env_dofile(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << "workspace\\" << lua_tostring(L, 1);
+
+        std::string content = FileIO::readFile(ss.str());
+
+        Instances::ScriptInstance script = Instances::ScriptInstance(content, lua_tostring(L, 1));
+
+        LuauHelper::QueuedScripts.push(script);
+
+        return 0;
+    }
 };

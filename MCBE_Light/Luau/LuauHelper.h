@@ -259,6 +259,26 @@ namespace LuauHelper {
         lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_appendfile, "appendfile");
         lua_setglobal(LuauHelper::GameState, "appendfile");
 
+        // define isfile
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_isfile, "isfile");
+        lua_setglobal(LuauHelper::GameState, "isfile");
+
+        // define isfolder
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_isfolder, "isfolder");
+        lua_setglobal(LuauHelper::GameState, "isfolder");
+
+        // define delfile
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_delfile, "delfile");
+        lua_setglobal(LuauHelper::GameState, "delfile");
+
+        // define delfolder
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_delfile, "delfolder");
+        lua_setglobal(LuauHelper::GameState, "delfolder");
+
+        // define dofile
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_dofile, "dofile");
+        lua_setglobal(LuauHelper::GameState, "dofile");
+
         /*
 
         /--- TODO ---\
@@ -268,9 +288,6 @@ namespace LuauHelper {
         getfps - get fps
         isactive - check if window is currently active or not
 
-        appendfile - append content to a file
-        isfile - checks if a workspace path is a file
-        isfolder - checks if a workspace path is a folder
         delfile - delete file from workspace
         delfolder - delete folder from workspace
         dofile - execute file on new thread

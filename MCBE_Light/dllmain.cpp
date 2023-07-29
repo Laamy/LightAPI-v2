@@ -10,6 +10,8 @@
 #include <map>
 #include <iostream>
 
+#pragma comment(lib, "User32.lib")
+
 #include <lua.h>
 #include <lualib.h>
 #include <luacode.h>

@@ -279,6 +279,10 @@ namespace LuauHelper {
         lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_dofile, "dofile");
         lua_setglobal(LuauHelper::GameState, "dofile");
 
+        // define setclipboard
+        lua_pushcfunction(LuauHelper::GameState, ScriptEnvrioment::env_setclipboard, "setclipboard");
+        lua_setglobal(LuauHelper::GameState, "setclipboard");
+
         /*
 
         /--- TODO ---\
@@ -287,10 +291,6 @@ namespace LuauHelper {
         setfps - set fps
         getfps - get fps
         isactive - check if window is currently active or not
-
-        delfile - delete file from workspace
-        delfolder - delete folder from workspace
-        dofile - execute file on new thread
 
         mouse1click - fake mouse1btn keydown
         mouse1press - fake mouse1btn keypress
@@ -302,14 +302,12 @@ namespace LuauHelper {
         mousemoverel - move mouse to relative position
         mousescroll - scroll mouse wheel
 
-        Console {
-            clear - clear console
-            create - create new console
-            destroy - destroy console
-            input - get console input
-            print - print to console
-            title - get/set console title
-        }
+        rconsoleclear - clear console
+        rconsolecreate - create new console
+        rconsoledestroy - destroy console
+        rconsoleinput - get console input
+        rconsoleprint - print to console
+        rconsoletitle - get/set console title
 
         Drawing {
             new - create new drawing object
@@ -317,16 +315,14 @@ namespace LuauHelper {
             clearcache - clear all drawings from the screen (does not destroy them)
         }
 
-        Http {
-			request - make a http request
-            WebSocket{
-			    connect - create new websocket
-				close - close websocket
-				send - send data to websocket
-                onmessage - hook websocket message event
-                onclose - hook websocket close event
-			}
-		}
+		request - make a http request
+        WebSocket{
+		    connect - create new websocket
+		    close - close websocket
+            send - send data to websocket
+            onmessage - hook websocket message event
+            onclose - hook websocket close event
+        }
 
         */
 

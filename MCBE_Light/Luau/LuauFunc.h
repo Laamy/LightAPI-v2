@@ -16,6 +16,34 @@ LUALIB_API int luaU_error(lua_State* L, const char* fmt, ...) {
     return 0;
 }
 
+// clkipboard stuff from stackoverflow
+bool setClipboardText(const std::string& text) {
+    if (!OpenClipboard(nullptr))
+        return false;
+
+    EmptyClipboard();
+
+    HGLOBAL hText = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1);
+    if (!hText) {
+        CloseClipboard();
+        return false;
+    }
+
+    char* pText = static_cast<char*>(GlobalLock(hText));
+    if (!pText) {
+        GlobalFree(hText);
+        CloseClipboard();
+        return false;
+    }
+
+    strcpy_s(pText, text.size() + 1, text.c_str());
+
+    GlobalUnlock(hText);
+    SetClipboardData(CF_TEXT, hText);
+    CloseClipboard();
+    return true;
+}
+
 // helper functions for calling game hooks
 template<typename T>
 void PushArgument(lua_State* L, T arg) {
@@ -599,6 +627,26 @@ public:
         Instances::ScriptInstance script = Instances::ScriptInstance(content, lua_tostring(L, 1));
 
         LuauHelper::QueuedScripts.push(script);
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Sets the window clipboard
+    /// </summary>
+    static int env_setclipboard(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        setClipboardText(lua_tostring(L, 1));
 
         return 0;
     }

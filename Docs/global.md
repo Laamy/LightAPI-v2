@@ -212,3 +212,14 @@ end)
 Spawns a new luau thread using the current thread identity
 
 <br/>
+
+```lua
+setclipboard(string content) -> returns 0
+```
+```lua
+-- set the windows clipboard to test
+setclipboard('test')
+```
+Set the windows clipboard to content
+
+<br/>

@@ -93,7 +93,14 @@ namespace Instances {
             // resume thread execution
             lua_resume(thread, 0, 0);
 
-            lua_pop(thread, 1);
+            int status = lua_resume(thread, 0, 1);
+
+            if (status != LUA_OK && status != LUA_YIELD) {
+                const char* error = lua_tostring(thread, -1);
+                lua_pop(thread, 1);
+
+                LogMessage(MESSAGE_ERROR, error);
+            }
         }
 
         // yield thread execution

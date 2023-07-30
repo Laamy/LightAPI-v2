@@ -41,6 +41,7 @@ FILE* __f;
 
 #pragma endregion
 
+// had to create a new thread for the input job else script queue would not be updated
 void InputThread() {
     while (true) {
         Instances::ScriptContext* context = Instances::ScriptContext::Get();

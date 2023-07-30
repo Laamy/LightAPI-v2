@@ -91,6 +91,8 @@ namespace Instances {
 
             // resume thread execution
             lua_resume(thread, 0, 0);
+
+            lua_pop(thread, 1);
         }
 
         // yield thread execution
@@ -327,7 +329,7 @@ namespace LuauHelper {
         }
 
         /*
-
+        
         /--- TODO ---\
 
         setfps - set fps

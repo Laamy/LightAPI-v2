@@ -23,7 +23,7 @@ public:
 		return true;
 	}
 
-	// singlton
+	// singleton
 	static ConsoleInputJob* Get() {
 		static ConsoleInputJob* instance;
 		return instance;

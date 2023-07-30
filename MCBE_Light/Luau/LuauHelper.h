@@ -74,6 +74,7 @@ namespace Instances {
 
         // threads that want input (resumed by consoleinputjob)
         std::queue<InputInstance*> inputThreads;
+        std::mutex inputThreadsMutex;
 
         // singleton function
         static ScriptContext* Get() {

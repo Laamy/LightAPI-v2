@@ -3,6 +3,8 @@
 class ConsoleInputJob : public JobBase {
 public:
 	bool ExecuteTask(Instances::ScriptContext* context, std::string input) {
+		std::lock_guard<std::mutex> lock(context->inputThreadsMutex);
+
 		if (!context->inputThreads.empty()) {
 			// get first thread in job queue
 			Instances::InputInstance* instance = context->inputThreads.front();
@@ -14,10 +16,16 @@ public:
 			lua_pushstring(instance->thread, input.c_str());
 
 			// resume thread execution with 1 argument and no states called it so return 0 too
-			lua_resume(instance->thread, 0, 1);
+			int status = lua_resume(instance->thread, 0, 1);
 
-			// pop result
-			lua_pop(instance->thread, 1);
+			if (status != LUA_OK && status != LUA_YIELD) {
+				const char* error = lua_tostring(instance->thread, -1);
+				lua_pop(instance->thread, 1);
+
+				LogMessage(MESSAGE_ERROR, error);
+
+				return false;
+			}
 		}
 
 		return true;

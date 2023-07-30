@@ -4,16 +4,19 @@ class ConsoleInputJob : public JobBase {
 public:
 	bool ExecuteTask(Instances::ScriptContext* context, std::string input) {
 		if (!context->inputThreads.empty()) {
-			// erase from input threads map
+			// get first thread in job queue
 			Instances::InputInstance* instance = context->inputThreads.front();
+
+			// pop first thread in job queue
 			context->inputThreads.pop();
 
+			// push input to thread
 			lua_pushstring(instance->thread, input.c_str());
-			//lua_pushstring(instance->thread, "test");
 
-			// resume thread execution
-			lua_resume(instance->thread, 0, 1);//LuauHelper::GameState
+			// resume thread execution with 1 argument and no states called it so return 0 too
+			lua_resume(instance->thread, 0, 1);
 
+			// pop result
 			lua_pop(instance->thread, 1);
 		}
 

@@ -717,10 +717,14 @@ public:
     /// </summary>
     static int env_rconsoleinput(lua_State* L)
     {
+        // get script context
         Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
+        // push the task onto the inputjobs queue
         context->YieldForInput(L);
 
+        // didnt push anything onto the stack before yielding so pass 0
+        // (not 1, we pass 1 when resuming as thats when we push the string)
         return lua_yield(L, 0);
     }
 

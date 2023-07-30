@@ -104,5 +104,8 @@
     <ClInclude Include="SDK\Job\Jobs\ConsoleInputJob.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\Job\Jobs\CrashJob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

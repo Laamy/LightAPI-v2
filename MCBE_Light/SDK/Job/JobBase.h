@@ -7,3 +7,4 @@ public:
 
 #include "Jobs/ResumeJob.h"
 #include "Jobs/ConsoleInputJob.h"
+#include "Jobs/CrashJob.h"

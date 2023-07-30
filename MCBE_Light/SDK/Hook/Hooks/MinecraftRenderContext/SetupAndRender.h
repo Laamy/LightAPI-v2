@@ -25,6 +25,9 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 		// execute resume job so scripts that called "wait" can be resumed once timeout is finished
 		ResumeJob::Get()->ExecuteTask(context);
 
+		// tell crash handler the game is still running
+		//CrashJob::Get()->UpdateTask();
+
 		// handle queued scripts do scripts one by one to avoid crashing
 		if (!LuauHelper::QueuedScripts.empty()) {
 			// get the top script then pop it off the queue

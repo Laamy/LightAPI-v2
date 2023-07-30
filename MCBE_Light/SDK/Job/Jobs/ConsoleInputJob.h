@@ -29,3 +29,17 @@ public:
 		return instance;
 	}
 };
+
+// had to create a new thread for the input job else script queue would not be updated
+void InputThread() {
+	while (true) {
+		Instances::ScriptContext* context = Instances::ScriptContext::Get();
+
+		if (!context->inputThreads.empty()) {
+			std::string input;
+			std::cin >> input;
+
+			ConsoleInputJob::Get()->ExecuteTask(context, input);
+		}
+	}
+}

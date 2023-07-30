@@ -3096,7 +3096,7 @@ namespace FastColoredTextBoxNS
             if (Created)
             {
                 if (ShowLineNumbers)
-                    LeftIndent += charsForLineNumber*CharWidth + minLeftIndent + 1;
+                    LeftIndent += charsForLineNumber*CharWidth + minLeftIndent;
 
                 //calc wordwrapping
                 if (needRecalcWordWrap)

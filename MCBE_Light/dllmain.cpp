@@ -41,20 +41,6 @@ FILE* __f;
 
 #pragma endregion
 
-// had to create a new thread for the input job else script queue would not be updated
-void InputThread() {
-    while (true) {
-        Instances::ScriptContext* context = Instances::ScriptContext::Get();
-
-        if (!context->inputThreads.empty()) {
-            std::string input;
-            std::cin >> input;
-
-            ConsoleInputJob::Get()->ExecuteTask(context, input);
-        }
-    }
-}
-
 void InitClient() {
     // setup debug console/output
     if (!GetConsoleWindow())
@@ -80,6 +66,8 @@ void InitClient() {
     LuauHelper::SetupEnvrionment();
 
     std::thread inputThread(InputThread);
+   /* std::thread crashThread(CrashThread);
+    crashThread.detach();*/
 
     // main loop
     while (true) {

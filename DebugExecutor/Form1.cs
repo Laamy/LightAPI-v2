@@ -1,23 +1,98 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+
+using FastColoredTextBoxNS;
+using System.Drawing;
 
 namespace DebugExecutor
 {
     public partial class Form1 : Form
     {
-        FastColoredTextBoxNS.FastColoredTextBox textbox;
+        FastColoredTextBox textbox;
+        AutocompleteMenu popupMenu;
 
         public Form1()
         {
-            textbox = new FastColoredTextBoxNS.FastColoredTextBox();
+            // create
+            textbox = new FastColoredTextBox();
+            popupMenu = new AutocompleteMenu(textbox);
+
+            // setup dock
             textbox.Dock = DockStyle.Fill;
-            textbox.Language = FastColoredTextBoxNS.Language.Lua;
+
+            // setup language
+            textbox.Language = Language.Luau;
+
+            // setup colours
+            textbox.BackColor = Color.FromArgb(40, 40, 40);
+            textbox.IndentBackColor = Color.FromArgb(60, 60, 60);
+            textbox.LineNumberColor = Color.White;
+            textbox.ForeColor = Color.White;
+
+            // setup font
+            textbox.Font = new Font("Arial", 12);
+
+            // setup autocomplete
+            textbox.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    e.Handled = true;
+                    textbox.InsertText("\n");
+                }
+                else
+                {
+                    popupMenu.Show(true);
+                }
+            };
+
+            // setup autocomplete
+            popupMenu.MinFragmentLength = 2;
+            popupMenu.Opacity = 0.5;
+            popupMenu.AllowTabKey = true;
+
+            var randomWords = new List<string>
+            {
+                "for", "do", "function", "end", "in", "pairs", "ipairs", // default lua stuff
+
+                "print", "warn", "error", // logging stuff
+
+                "identity", "printidentity", "version", "getidentity", // identity stuff
+
+                "createscript", "loadstring", // script chunk stuff
+
+                "wait", // wait & resume stuff
+
+                "readfile", "listfiles", "writefile", // file stuff
+                "makefolder", "appendfile", "isfile", "isfolder",
+                "delfile", "delfolder", "dofile",
+
+                "rconsoleclear", "rconsolecreate", "rconsoledestroy",
+                "rconsoleprint", "rconsoleinput", "rconsoletitle",
+
+                "time", "setclipboard" // misc stuff
+            };
+
+            popupMenu.Items.SetAutocompleteItems(randomWords);
+            popupMenu.Items.MaximumSize = new System.Drawing.Size(200, 300);
+            popupMenu.Items.Width = 200;
+
+            // add to form
             Controls.Add(textbox);
 
+            // setup client path/pipes
             FileIO.SetupClientPath();
 
+            // setup form
             InitializeComponent();
+        }
+
+        private void Textbox_KeyDown(object sender, KeyEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void ExitAppBtn(object sender, System.EventArgs e)

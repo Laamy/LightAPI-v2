@@ -12,14 +12,14 @@ namespace FastColoredTextBoxNS
     {
         //styles
         protected static readonly Platform platformType = PlatformType.GetOperationSystemPlatform();
-        public readonly Style BlueBoldStyle = new TextStyle(Brushes.Blue, null, FontStyle.Bold);
-        public readonly Style BlueStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
+        public readonly Style BlueBoldStyle = new TextStyle(Brushes.LightSkyBlue, null, FontStyle.Bold);
+        public readonly Style BlueStyle = new TextStyle(Brushes.LightSkyBlue, null, FontStyle.Regular);
         public readonly Style BoldStyle = new TextStyle(null, null, FontStyle.Bold | FontStyle.Underline);
         public readonly Style BrownStyle = new TextStyle(Brushes.Brown, null, FontStyle.Italic);
         public readonly Style GrayStyle = new TextStyle(Brushes.Gray, null, FontStyle.Regular);
         public readonly Style GreenStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
         public readonly Style MagentaStyle = new TextStyle(Brushes.Magenta, null, FontStyle.Regular);
-        public readonly Style MaroonStyle = new TextStyle(Brushes.Maroon, null, FontStyle.Regular);
+        public readonly Style MaroonStyle = new TextStyle(Brushes.MediumVioletRed, null, FontStyle.Regular);
         public readonly Style RedStyle = new TextStyle(Brushes.Red, null, FontStyle.Regular);
         public readonly Style BlackStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular);
         //
@@ -173,7 +173,7 @@ namespace FastColoredTextBoxNS
                 case Language.JS:
                     JScriptSyntaxHighlight(range);
                     break;
-                case Language.Lua:
+                case Language.Luau:
                     LuaSyntaxHighlight(range);
                     break;
                 case Language.JSON:
@@ -232,7 +232,7 @@ namespace FastColoredTextBoxNS
                 case Language.JS:
                     CSharpAutoIndentNeeded(sender, args);
                     break; //JS like C#
-                case Language.Lua:
+                case Language.Luau:
                     LuaAutoIndentNeeded(sender, args);
                     break;
                 default:
@@ -662,10 +662,10 @@ namespace FastColoredTextBoxNS
                     NumberStyle = MagentaStyle;
                     KeywordStyle = BlueStyle;
                     break;
-                case Language.Lua:
-                    StringStyle = BrownStyle;
+                case Language.Luau:
+                    StringStyle = GreenStyle;
                     CommentStyle = GreenStyle;
-                    NumberStyle = MagentaStyle;
+                    NumberStyle = BlueStyle;
                     KeywordStyle = BlueBoldStyle;
                     FunctionsStyle = MaroonStyle;
                     break;
@@ -1477,7 +1477,7 @@ namespace FastColoredTextBoxNS
         SQL,
         PHP,
         JS,
-        Lua,
+        Luau,
         JSON
     }
 }

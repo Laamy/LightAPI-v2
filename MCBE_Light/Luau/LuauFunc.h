@@ -16,7 +16,7 @@ LUALIB_API int luaU_error(lua_State* L, const char* fmt, ...) {
     return 0;
 }
 
-// stolen code
+// clear console by filling with spaces then setting cursor to 0,0 lol
 void ClearConsoleScreen() {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -717,12 +717,11 @@ public:
     /// </summary>
     static int env_rconsoleinput(lua_State* L)
     {
-        std::string input;
-        std::cin >> input;
+        Instances::ScriptContext* context = Instances::ScriptContext::Get();
 
-        lua_pushstring(L, input.c_str());
+        context->YieldForInput(L);
 
-        return 1;
+        return lua_yield(L, 0);
     }
 
     /// <summary>

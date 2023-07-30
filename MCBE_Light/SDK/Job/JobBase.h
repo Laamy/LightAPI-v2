@@ -6,3 +6,4 @@ public:
 };
 
 #include "Jobs/ResumeJob.h"
+#include "Jobs/ConsoleInputJob.h"

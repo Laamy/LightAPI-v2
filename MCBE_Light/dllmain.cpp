@@ -9,6 +9,7 @@
 #include <queue>
 #include <map>
 #include <iostream>
+#include <mutex>
 
 #pragma comment(lib, "User32.lib")
 
@@ -40,6 +41,19 @@ FILE* __f;
 
 #pragma endregion
 
+void InputThread() {
+    while (true) {
+        Instances::ScriptContext* context = Instances::ScriptContext::Get();
+
+        if (!context->inputThreads.empty()) {
+            std::string input;
+            std::cin >> input;
+
+            ConsoleInputJob::Get()->ExecuteTask(context, input);
+        }
+    }
+}
+
 void InitClient() {
     // setup debug console/output
     if (!GetConsoleWindow())
@@ -63,6 +77,8 @@ void InitClient() {
 
     // setup game state
     LuauHelper::SetupEnvrionment();
+
+    std::thread inputThread(InputThread);
 
     // main loop
     while (true) {

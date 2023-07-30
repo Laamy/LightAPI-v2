@@ -57,6 +57,12 @@ namespace Instances {
         double end;
     };
 
+    // timeout instance used for consoleinputjobs
+    class InputInstance {
+    public:
+        lua_State* thread;
+    };
+
     // context for scripts (lua states/threads)
     class ScriptContext {
     public:
@@ -65,6 +71,9 @@ namespace Instances {
 
         // lua states/threads that are yielding (resumed by resumejob)
         std::map<lua_State*, TimeoutInstance*> yieldThreads;
+
+        // threads that want input (resumed by consoleinputjob)
+        std::queue<InputInstance*> inputThreads;
 
         // singleton function
         static ScriptContext* Get() {
@@ -98,6 +107,19 @@ namespace Instances {
             // tell script context that this thread is yielding by inserting into yield threads map
             context->yieldThreads.insert(std::pair<lua_State*, Instances::TimeoutInstance*>(thread, timeoutInst));
 		}
+
+        // used to yield for input
+        void YieldForInput(lua_State* thread) {
+            // get script context
+            Instances::ScriptContext* context = Instances::ScriptContext::Get();
+
+            // make input instance
+            Instances::InputInstance* input = new Instances::InputInstance();
+            input->thread = thread;
+
+            // tell script context that this thread is yielding by inserting into input threads map
+            context->inputThreads.push(input);
+        }
 
         // assign extrainstance to luau state/thread
         void Set(lua_State* L, ExtraInstance* extra) {

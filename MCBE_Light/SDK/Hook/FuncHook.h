@@ -8,13 +8,15 @@ public:
 // include hooks here
 #include "Hooks/Keyboard/KeymapHook.h"
 #include "Hooks/MinecraftRenderContext/SetupAndRender.h"
+#include "Hooks/MinecraftRenderContext/SchedulerRate.h"
 
 void InitHooks() {
 	// initialize hooks here
 	static FuncHook* hooks[] = {
 		// include hooks here
         &KeymapHook::Get(),
-        &SetupAndRenderHook::Get()
+        &SetupAndRenderHook::Get(),
+        &SchedulerRateHook::Get()
 	};
 
     for (std::size_t i = 0; i < std::size(hooks); ++i)

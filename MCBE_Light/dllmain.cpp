@@ -31,6 +31,8 @@ FILE* __f;
 
 #include "FileIO.h"
 
+#include "SDK/GameCore/SchedulerRate.h"
+
 #include "SDK/MemoryUtils.h"
 #include "SDK/Game.h"
 

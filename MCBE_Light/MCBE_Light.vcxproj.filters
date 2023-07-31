@@ -107,5 +107,11 @@
     <ClInclude Include="SDK\Job\Jobs\CrashJob.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\Hook\Hooks\MinecraftRenderContext\SchedulerRate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\SchedulerRate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

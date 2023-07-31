@@ -13,7 +13,6 @@ void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
 			UILayer::Toast_ToastScreen,
 			UILayer::Debug_DebugScreen,
 		})) {
-
 		// call the render frame event in luau
 		//CallGameCallHooks(LuauHelper::GameState, Game::GameEvent::Update, screenview->tree->root->GetName().c_str());
 

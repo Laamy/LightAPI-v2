@@ -302,6 +302,8 @@ namespace LuauHelper {
         // misc
         { "time", ScriptEnvrioment::env_time },
         { "setclipboard", ScriptEnvrioment::env_setclipboard },
+        { "setfps", ScriptEnvrioment::env_setfps },
+        { "getfps", ScriptEnvrioment::env_getfps },
     };
 
     inline void SetupEnvrionment() {
@@ -340,8 +342,6 @@ namespace LuauHelper {
         
         /--- TODO ---\
 
-        setfps - set fps
-        getfps - get fps
         isactive - check if window is currently active or not
 
         mouse1click - fake mouse1btn keydown

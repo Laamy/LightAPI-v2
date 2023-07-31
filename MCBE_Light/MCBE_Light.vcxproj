@@ -183,10 +183,12 @@
     <ClInclude Include="Luau\LuauFunc.h" />
     <ClInclude Include="Luau\LuauHelper.h" />
     <ClInclude Include="SDK\Game.h" />
+    <ClInclude Include="SDK\GameCore\SchedulerRate.h" />
     <ClInclude Include="SDK\GameCore\ScreenView.h" />
     <ClInclude Include="SDK\GameCore\UILayer.h" />
     <ClInclude Include="SDK\Hook\FuncHook.h" />
     <ClInclude Include="SDK\Hook\Hooks\Keyboard\KeymapHook.h" />
+    <ClInclude Include="SDK\Hook\Hooks\MinecraftRenderContext\SchedulerRate.h" />
     <ClInclude Include="SDK\Hook\Hooks\MinecraftRenderContext\SetupAndRender.h" />
     <ClInclude Include="SDK\Job\JobBase.h" />
     <ClInclude Include="SDK\Job\Jobs\ConsoleInputJob.h" />

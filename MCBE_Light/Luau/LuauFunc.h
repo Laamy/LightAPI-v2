@@ -771,4 +771,48 @@ public:
 
         return 0;
     }
+
+    /// <summary>
+    /// set game target framerate
+    /// </summary>
+    static int env_setfps(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (nargs < 1) {
+            return luaU_error(L, "atleast 1 argument expected");
+        }
+
+        if (!lua_isnumber(L, 1)) {
+            return luaU_error(L, "number arguments expected");
+        }
+
+        double fps = lua_tonumber(L, 1);
+
+        SchedulerRate* scheduler = Game::Scheduler;
+
+        if (scheduler == nullptr) {
+            return luaU_error(L, "luauhelper failed to hook the frame scheduler (cant call these functions until updated)");
+        }
+
+        scheduler->framerate = fps;
+
+        return 0;
+    }
+
+    /// <summary>
+    /// get the game target framerate
+    /// </summary>
+    static int env_getfps(lua_State* L)
+    {
+        SchedulerRate* scheduler = Game::Scheduler;
+
+        if (scheduler == nullptr) {
+            return luaU_error(L, "luauhelper failed to hook the frame scheduler (cant call these functions until updated)");
+        }
+
+        lua_pushnumber(L, scheduler->framerate);
+
+        return 1;
+    }
 };

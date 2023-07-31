@@ -74,6 +74,8 @@ namespace Instances {
 
         // threads that want input (resumed by consoleinputjob)
         std::queue<InputInstance*> inputThreads;
+
+        // avoid multiple input threads from triggering at once (queue only)
         std::mutex inputThreadsMutex;
 
         // singleton function
@@ -91,9 +93,7 @@ namespace Instances {
             context->yieldThreads.erase(thread);
 
             // resume thread execution
-            lua_resume(thread, 0, 0);
-
-            int status = lua_resume(thread, 0, 1);
+            int status = lua_resume(thread, 0, 0);
 
             if (status != LUA_OK && status != LUA_YIELD) {
                 const char* error = lua_tostring(thread, -1);

@@ -304,6 +304,7 @@ namespace LuauHelper {
         { "setclipboard", ScriptEnvrioment::env_setclipboard },
         { "setfps", ScriptEnvrioment::env_setfps },
         { "getfps", ScriptEnvrioment::env_getfps },
+        { "isactive", ScriptEnvrioment::env_isactive },
     };
 
     inline void SetupEnvrionment() {

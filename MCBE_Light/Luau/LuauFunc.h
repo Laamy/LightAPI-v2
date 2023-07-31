@@ -815,4 +815,18 @@ public:
 
         return 1;
     }
+
+    /// <summary>
+    /// returns if the game is selected or not
+    /// </summary>
+    static int env_isactive(lua_State* L)
+    {
+        HWND activeWindow = GetForegroundWindow();
+        char windowTitle[256];
+        GetWindowText(activeWindow, windowTitle, 256);
+
+        lua_pushboolean(L, strcmp(windowTitle, "Minecraft") == 0);
+
+        return 1;
+    }
 };

@@ -343,8 +343,6 @@ namespace LuauHelper {
         
         /--- TODO ---\
 
-        isactive - check if window is currently active or not
-
         mouse1click - fake mouse1btn keydown
         mouse1press - fake mouse1btn keypress
         mouse1release - fake mouse1btn keyup

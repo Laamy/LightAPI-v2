@@ -288,7 +288,7 @@ namespace LuauHelper {
         { "isfile", ScriptEnvrioment::env_isfile },
         { "isfolder", ScriptEnvrioment::env_isfolder },
         { "delfile", ScriptEnvrioment::env_delfile },
-        { "delfolder", ScriptEnvrioment::env_delfile },
+        { "delfolder", ScriptEnvrioment::env_delfolder },
         { "dofile", ScriptEnvrioment::env_dofile },
 
         // console api
@@ -305,6 +305,9 @@ namespace LuauHelper {
         { "setfps", ScriptEnvrioment::env_setfps },
         { "getfps", ScriptEnvrioment::env_getfps },
         { "isactive", ScriptEnvrioment::env_isactive },
+
+        // drawing
+        { "__tmp__drawingnew", ScriptEnvrioment::env_drawing_new },
     };
 
     inline void SetupEnvrionment() {
@@ -370,7 +373,7 @@ namespace LuauHelper {
 
         */
 
-        LuauHelper::ExecuteLuau("-- define hookslist\nGame.HooksList = {};\n\n-- define game metatable\nlocal GameMetatable = { __index = Game };\n\n-- define games connect function used to hook events\n-- usage: Game:Connect('render', function(screen, renderctx) end)\nfunction Game:Connect(event, callback)\n	if type(callback) == 'function' then\n		if not Game.HooksList[event] then\n			Game.HooksList[event] = {}\n		end\n		table.insert(Game.HooksList[event], callback)\n	else \n		error('Invalid callback provided for event ' .. event)\n	end\nend\n\n-- game events enum\nEnum.GameEvent = {\n	String = {\n		[1] = 'update',\n		[2] = 'keydown',\n		[3] = 'keyup',\n		[4] = 'keypress'\n	},\n	Update = 1,\n	KeyDown = 2,\n	KeyUp = 3,\n	KeyPress = 4\n};\n\n-- used to trigger a set of hooks (if they exist)\nfunction Game:CallHooks(event, ...)\n	if type(event) == 'number' then\n		event = Enum.GameEvent.String[event];\n	end\n	\n    if Game.HooksList[event] then\n        for _, hook in ipairs(Game.HooksList[event]) do\n            hook(...)\n        end\n    end\nend\n\n-- no clue how roblox exactly does theirs\n-- im just gonna do coroutine wrap until i figure that out\nfunction spawn(func)\n	coroutine.wrap(func)() -- call it in a new wrap/thread\nend\n\n-- set game metatable then quit\nsetmetatable(Game, GameMetatable);",
+        LuauHelper::ExecuteLuau("-- define hookslist\nGame.HooksList = {};\n\n-- define game metatable\nlocal GameMetatable = { __index = Game };\n\n-- define games connect function used to hook events\n-- usage: Game:Connect('render', function(screen, renderctx) end)\nfunction Game:Connect(event, callback)\n	if type(callback) == 'function' then\n		if not Game.HooksList[event] then\n			Game.HooksList[event] = {}\n		end\n		table.insert(Game.HooksList[event], callback)\n	else \n		error('Invalid callback provided for event ' .. event)\n	end\nend\n\n-- game events enum\nEnum.GameEvent = {\n	String = {\n		[1] = 'update',\n		[2] = 'keydown',\n		[3] = 'keyup',\n		[4] = 'keypress'\n	},\n	Update = 1,\n	KeyDown = 2,\n	KeyUp = 3,\n	KeyPress = 4\n};\n\n-- used to trigger a set of hooks (if they exist)\nfunction Game:CallHooks(event, ...)\n	if type(event) == 'number' then\n		event = Enum.GameEvent.String[event];\n	end\n	\n    if Game.HooksList[event] then\n        for _, hook in ipairs(Game.HooksList[event]) do\n            hook(...)\n        end\n    end\nend\n\n-- no clue how roblox exactly does theirs\n-- im just gonna do coroutine wrap until i figure that out\nfunction spawn(func)\n	coroutine.wrap(func)() -- call it in a new wrap/thread\nend\n\n-- returns the custom global envrionmnet for the executor\nfunction getgenv()\n	return _G\nend\n\nlocal __local__drawingnew = __tmp__drawingnew\n__tmp__drawingnew = nil\n\nDrawing = {\n	new = function(type, ...)\n		return __local__drawingnew(type, ...)\n	end\n}\n\n-- set game metatable then quit\nsetmetatable(Game, GameMetatable);",
             "InitScript", LuauHelper::Security::SystemScript);
     }
 }

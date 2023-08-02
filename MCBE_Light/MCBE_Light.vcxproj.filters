@@ -89,10 +89,10 @@
     <ClInclude Include="SDK\Hook\Hooks\MinecraftRenderContext\SetupAndRender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\GameCore\UILayer.h">
+    <ClInclude Include="SDK\GameCore\Rendering\UILayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\GameCore\ScreenView.h">
+    <ClInclude Include="SDK\GameCore\Rendering\ScreenView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\Job\JobBase.h">
@@ -110,7 +110,67 @@
     <ClInclude Include="SDK\Hook\Hooks\MinecraftRenderContext\SchedulerRate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\GameCore\SchedulerRate.h">
+    <ClInclude Include="SDK\GameCore\Rendering\SchedulerRate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\RenderContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\ClientInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\ScreenContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\UIScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\Vector2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\UIColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\Vector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\Vector4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\AABB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\CaretMeasureData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\Keys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\MCTextFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\TextInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Math\TextHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\GLMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\UIControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\GameCore\Rendering\TextMeasureData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Luau\LuauDrawingObjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

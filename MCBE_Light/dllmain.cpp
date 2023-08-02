@@ -31,7 +31,17 @@ FILE* __f;
 
 #include "FileIO.h"
 
-#include "SDK/GameCore/SchedulerRate.h"
+#include "SDK/GameCore/Rendering/SchedulerRate.h"
+
+#include "SDK/GameCore/Math/MCTextFormat.h"
+#include "SDK/GameCore/Math/TextInput.h"
+#include "SDK/GameCore/Math/Keys.h"
+#include "SDK/GameCore/Math/Math.h"
+#include "SDK/GameCore/Math/Vector2.h"
+#include "SDK/GameCore/Math/Vector3.h"
+#include "SDK/GameCore/Math/Vector4.h"
+#include "SDK/GameCore/Math/AABB.h"
+#include "SDK/GameCore/Math/UIColor.h"
 
 #include "SDK/MemoryUtils.h"
 #include "SDK/Game.h"

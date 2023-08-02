@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LuauDrawingObjects.h"
+
 #define LUA_QL(x)	"'" x "'"
 #define LUA_QS		LUA_QL("%s")
 
@@ -595,7 +597,7 @@ public:
     }
 
     /// <summary>
-    /// returns if path is a folder or not
+    /// delete file
     /// </summary>
     static int env_delfile(lua_State* L)
     {
@@ -617,7 +619,43 @@ public:
 
         folder = ss.str();
 
+        if (std::filesystem::is_directory(folder)) {
+            return luaU_error(L, "use delfolder for folders");
+        }
+
         std::filesystem::remove(folder.c_str());
+
+        return 0;
+    }
+
+    /// <summary>
+    /// delete folder & its contents
+    /// </summary>
+    static int env_delfolder(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        std::string folder;
+        std::string client = FileIO::getClientPath();
+
+        if (nargs < 1) {
+            return luaU_error(L, "expected atleast 1 argument");
+        }
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "expected string");
+        }
+
+        std::stringstream ss;
+        ss << client << "workspace\\" << std::string(lua_tostring(L, 1));
+
+        folder = ss.str();
+
+        if (!std::filesystem::is_directory(folder)) {
+            return luaU_error(L, "use delfile for files");
+        }
+
+        std::filesystem::remove_all(folder.c_str());
 
         return 0;
     }
@@ -674,8 +712,6 @@ public:
     /// </summary>
     static int env_rconsoleclear(lua_State* L)
     {
-        // lol im lazy
-        // calls system batch command "cls" (NOT SAFE)
         ClearConsoleScreen();
 
         return 0;
@@ -827,6 +863,77 @@ public:
 
         lua_pushboolean(L, strcmp(windowTitle, "Minecraft") == 0);
 
+        return 1;
+    }
+
+    /// <summary>
+    /// create new drawng object
+    /// Drawing.new(type, {x, y}, {sizex, sizey}, {r, g, b, a}, thickness) -> returns 1
+    /// </summary>
+    static int env_drawing_new(lua_State* L)
+    {
+        int nargs = lua_gettop(L);
+
+        if (!lua_isstring(L, 1)) {
+            return luaU_error(L, "string argument expected");
+        }
+
+        std::string type = lua_tostring(L, 1);
+
+        if (type == "Rectangle") {
+            if (nargs < 5) {
+                return luaU_error(L, "expected atleast 5 arguments (type, {x, y}, {sizex, sizey}, {r, g, b, a}, thickness, filled)");
+            }
+
+            if (!lua_istable(L, 2) || !lua_istable(L, 3) || !lua_istable(L, 4) ||
+                !lua_isnumber(L, 5) || !lua_isboolean(L, 6)) {
+                return luaU_error(L, "expected atleast 5 arguments (type, {x, y}, {sizex, sizey}, {r, g, b, a}, thickness, filled)");
+            }
+
+            // stack breaks at the end so we've gotta get this first
+            float thickness = lua_tonumber(L, 5);
+            bool filled = lua_toboolean(L, 6);
+
+            // x,y position table
+            lua_rawgeti(L, 2, 1);
+            lua_rawgeti(L, 2, 2);
+            float x = lua_tonumber(L, -2);
+            float y = lua_tonumber(L, -1);
+            lua_pop(L, 2);
+
+            // x,y size table
+            lua_rawgeti(L, 3, 1);
+            lua_rawgeti(L, 3, 2);
+            float sizex = lua_tonumber(L, -2);
+            float sizey = lua_tonumber(L, -1);
+            lua_pop(L, 3);
+
+            // r,g,b,a colour table
+            lua_rawgeti(L, 4, 1);
+            lua_rawgeti(L, 4, 2);
+            lua_rawgeti(L, 4, 3);
+            lua_rawgeti(L, 4, 4);
+            float r = lua_tonumber(L, -4);
+            float g = lua_tonumber(L, -3);
+            float b = lua_tonumber(L, -2);
+            float a = lua_tonumber(L, -1);
+            lua_pop(L, 4);
+
+            float alpha = a;
+            UIColor colour(r, g, b, alpha);
+
+            Vector2<float> position(x, y);
+            Vector2<float> size(sizex, sizey);
+
+            drawing_rectangles.push_back(new Drawing_Rectangle(position, size, colour, alpha, thickness, filled));
+
+            lua_pushnumber(L, drawing_rectangles.back()->uid);
+        }
+        else {
+		    return luaU_error(L, "invalid drawing type");
+        }
+
+        // returns instance uid
         return 1;
     }
 };

@@ -73,7 +73,7 @@ namespace DebugExecutor
                 "rconsoleclear", "rconsolecreate", "rconsoledestroy",
                 "rconsoleprint", "rconsoleinput", "rconsoletitle",
 
-                "time", "setclipboard" // misc stuff
+                "time", "setclipboard", "getfps", "setfps", "isactive" // misc stuff
             };
 
             popupMenu.Items.SetAutocompleteItems(randomWords);

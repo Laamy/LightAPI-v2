@@ -2,20 +2,31 @@
 
 void* __o__SetupAndRender;
 
-#include "../../../GameCore/UILayer.h"
+#include "../../../GameCore/Rendering/UILayer.h"
+#include "../../../GameCore/Rendering/RenderContext.h"
 
-void SetupAndRenderDetour(ScreenView* screenview, uintptr_t mcRenderCtx) {
+void SetupAndRenderDetour(ScreenView* screenview, RenderContext* ctx) {
 	// render mc main layer
-	CallFunc<void, ScreenView*, uintptr_t>(__o__SetupAndRender, screenview, mcRenderCtx);
+	CallFunc<void, ScreenView*, RenderContext*>(__o__SetupAndRender, screenview, ctx);
 
 	// main frame render call if these pass
 	if (UILayer::IsNot(screenview, {
 			UILayer::Toast_ToastScreen,
 			UILayer::Debug_DebugScreen,
 		})) {
-		// call the render frame event in luau
-		//CallGameCallHooks(LuauHelper::GameState, Game::GameEvent::Update, screenview->tree->root->GetName().c_str());
 
+		for (Drawing_Rectangle* obj : drawing_rectangles) {
+			if (!obj->visible)
+				continue;
+
+			if (obj->filled) {
+				ctx->fillRectangle(Vector4<float>(obj->position, obj->size), obj->colour, obj->alpha);
+			}
+			else {
+				ctx->drawRectangle(Vector4<float>(obj->position, obj->size), obj->colour, obj->alpha, obj->radius);
+			}
+		}
+		
 		// handle the waiting scripts (doing this here is cuz it'll crash or lag if we do it in the main loop, or any in general)
 
 		// get script context

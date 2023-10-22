@@ -3,9 +3,10 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+using System.Drawing;
 
 using FastColoredTextBoxNS;
-using System.Drawing;
+using System.IO;
 
 namespace DebugExecutor
 {
@@ -27,8 +28,8 @@ namespace DebugExecutor
             textbox.Language = Language.Luau;
 
             // setup colours
-            textbox.BackColor = Color.FromArgb(40, 40, 40);
-            textbox.IndentBackColor = Color.FromArgb(60, 60, 60);
+            textbox.BackColor = Color.FromArgb(30, 26, 10);
+            textbox.IndentBackColor = Color.FromArgb(30, 26, 10);
             textbox.LineNumberColor = Color.White;
             textbox.ForeColor = Color.White;
 
@@ -110,15 +111,14 @@ namespace DebugExecutor
         }
 
         int counter = 0;
-        private void executeToolStripMenuItem_Click(object sender, System.EventArgs e)
+        private void execute(object sender, EventArgs e)
         {
             if (!BetronaPipes.Execute(textbox.Text))
             {
                 if (BetronaPipes.InjectDLL() && counter >= 3)
                 {
-                    Thread.Sleep(50);
                     counter++;
-                    executeToolStripMenuItem_Click(sender, e);
+                    execute(sender, e);
                 }
                 else
                 {
@@ -126,6 +126,54 @@ namespace DebugExecutor
 
                     MessageBox.Show($"Fatal injection error (Try inject first)", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        private void clear(object sender, EventArgs e)
+        {
+            textbox.Clear();
+        }
+
+        private void openFile(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Title = "Open File",
+                CheckFileExists = true,
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+                textbox.Text = File.ReadAllText(dialog.FileName);
+        }
+
+        private void executeFile(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Title = "Execute File",
+                CheckFileExists = true,
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                if (!BetronaPipes.Execute(File.ReadAllText(dialog.FileName)))
+                {
+                    MessageBox.Show($"Fatal injection error (Try inject first)", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void saveFile(object sender, EventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog()
+            {
+                Title = "Save File",
+                CheckFileExists = true
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+
             }
         }
     }

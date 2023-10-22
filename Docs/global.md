@@ -223,3 +223,25 @@ setclipboard('test')
 Set the windows clipboard to content
 
 <br/>
+
+```lua
+getfps() -> returns 1
+```
+```lua
+-- returns e.g. 60
+print(getfps())
+```
+Gets the games framerate from the scheduler
+
+<br/>
+
+```lua
+setfps(double fps) -> returns 0
+```
+```lua
+-- have the game do as many frames as it can do
+setfps(0)
+```
+Sets the games framerate from the scheduler (0 for infinite)
+
+<br/>

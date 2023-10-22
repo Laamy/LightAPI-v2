@@ -12,7 +12,7 @@ uintptr_t SchedulerRateDetour(SchedulerRate* _this) {
 class SchedulerRateHook : public FuncHook {
 public:
 	bool Initialize() override {
-		uintptr_t schedulerRateAddr = findOffset(xorstr_("48 8B 41 08 48 8B 90 ? ? ? ? 48 85 D2 74 13 48 8B 42 08 48 8B CA 48 8B 90 ? ? ? ? 48 85 D2 75 ED 8B"), xorstr_("SchedulerRate"));
+		uintptr_t schedulerRateAddr = findOffset(xorstr_("48 8B 41 08 48 8B 80 ? ? ? ? 48 85 C0 74 13 48 8B C8 48 8B 40 08 48 8B 80 ? ? ? ? 48 85 C0 75 ED 8B"), xorstr_("SchedulerRate"));
 
 		if (not HookFunction((void*)schedulerRateAddr, &SchedulerRateDetour, &__o__SchedulerRate))
 			return false;

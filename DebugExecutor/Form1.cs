@@ -91,24 +91,8 @@ namespace DebugExecutor
             InitializeComponent();
         }
 
-        private void Textbox_KeyDown(object sender, KeyEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void ExitAppBtn(object sender, System.EventArgs e)
-            => Application.Exit();
-
         private void KillMinecraftBtn(object sender, System.EventArgs e)
             => Process.GetProcessesByName("Minecraft.Windows")[0].Kill();
-
-        private void InjectBtn(object sender, System.EventArgs e)
-        {
-            if (!BetronaPipes.InjectDLL())
-            {
-                MessageBox.Show($"Failed to inject {Text} (Already injected?)", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         int counter = 0;
         private void execute(object sender, EventArgs e)
@@ -173,7 +157,15 @@ namespace DebugExecutor
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
+                File.WriteAllText(dialog.FileName, textbox.Text);
+            }
+        }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (!BetronaPipes.InjectDLL())
+            {
+                MessageBox.Show($"Failed to inject {Text} (Already injected?)", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

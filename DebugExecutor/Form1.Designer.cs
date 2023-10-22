@@ -36,11 +36,13 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.Scripts = new System.Windows.Forms.Panel();
+            this.button7 = new System.Windows.Forms.Button();
             this.Buttons.SuspendLayout();
             this.SuspendLayout();
             // 
             // Buttons
             // 
+            this.Buttons.Controls.Add(this.button7);
             this.Buttons.Controls.Add(this.button6);
             this.Buttons.Controls.Add(this.button5);
             this.Buttons.Controls.Add(this.button4);
@@ -144,6 +146,21 @@
             this.Scripts.Size = new System.Drawing.Size(81, 260);
             this.Scripts.TabIndex = 2;
             // 
+            // button7
+            // 
+            this.button7.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.button7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(40)))), ((int)(((byte)(30)))));
+            this.button7.FlatAppearance.BorderSize = 0;
+            this.button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button7.ForeColor = System.Drawing.SystemColors.Control;
+            this.button7.Location = new System.Drawing.Point(553, 9);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(75, 32);
+            this.button7.TabIndex = 6;
+            this.button7.Text = "Attach";
+            this.button7.UseVisualStyleBackColor = false;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -170,6 +187,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button7;
     }
 }
 
